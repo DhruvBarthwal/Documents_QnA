@@ -1,13 +1,13 @@
 from typing import Dict
 from agent.state import AgentState
-from mcp.client import MCPClient
 from langchain_groq import ChatGroq
-from agent.prompts import System_Prompt
-import os
 from agent.prompts import SYSTEM_PROMPT
+import os
 from langchain_core.messages import SystemMessage, HumanMessage
+import requests
+from cache.cache import AnswerCache
 
-mcp = MCPClient("https://localhost:3333")
+cache = AnswerCache()
 
 llm = ChatGroq(
     model = "llama-3.1-8b-instant",
@@ -16,12 +16,17 @@ llm = ChatGroq(
     api_key = os.getenv("GROQ_API_KEY")
 )
 
-def retrieve_node (state: AgentState) -> AgentState:
-    response = mcp.call_tool(
-        "search_documents",
-        {"query" : state["query"], "top_k" : 5}
+def retrieve_node(state: AgentState) -> AgentState:
+    response = requests.post(
+        "http://localhost:3333/mcp/search_documents",
+        json={
+            "query": state["query"],
+            "top_k": 5
+        },
+        timeout=30
     )
-    state["contexts"] = response.get("results", [])
+
+    state["contexts"] = response.json().get("results", [])
     return state
 
 def validate_node(state: AgentState) -> AgentState:
@@ -54,4 +59,24 @@ def generate_node(state: AgentState) -> AgentState:
     response = llm.invoke(messages)
     
     state["answer"] = response.content.strip()
+    return state
+
+def cache_lookup_node(state: AgentState) -> AgentState:
+    cached_answer = cache.get(state["query"])
+
+    if cached_answer and cached_answer.strip():
+        state["answer"] = cached_answer
+        state["contexts"] = []
+        state["cache_hit"] = True
+    else:
+        state["cache_hit"] = False
+
+    return state
+    
+def cache_store_node(state: AgentState) -> AgentState:
+    answer = state.get("answer", "").strip()
+
+    if answer and answer.lower() != "not found in documents.":
+        cache.set(state["query"], answer)
+
     return state

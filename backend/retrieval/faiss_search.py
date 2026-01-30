@@ -42,27 +42,39 @@ class FaissSearcher:
     
     def search(self, query: str, top_k: int = 5) -> List[Dict]:
         query_vec = self.embed_query(query)
-        
-        scores, indices  = self.index.search(query_vec, top_k)
-        
+
+        scores, indices = self.index.search(query_vec, top_k)
+
+        seen = set()
         results = []
-        
+
         for score, idx in zip(scores[0], indices[0]):
             if idx == -1:
                 continue
-            
+
+            if score < 0.4:
+                continue
+
+            chunk_id = self.metadata[idx].get("chunk_id", idx)
+
+            if chunk_id in seen:
+                continue
+
+            seen.add(chunk_id)
+
             results.append({
-                "text" : self.texts[idx],
-                "score" : float(score),
-                "metadata" : self.metadata[idx]
+                "text": self.texts[idx],
+                "score": float(score),
+                "metadata": self.metadata[idx]
             })
-            
+
         return results
+
 
 if __name__ == "__main__":
     searcher = FaissSearcher()
 
-    query = "What is the enrollment no.?"
+    query = "What to do in Convolutional Neural Networks ?"
     results = searcher.search(query, top_k=3)
 
     for i, r in enumerate(results, 1):

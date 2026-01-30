@@ -11,3 +11,4 @@ mcp
 langgraph
 langchain-core
 diskcache
+fastapi

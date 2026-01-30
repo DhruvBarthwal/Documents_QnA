@@ -1,4 +1,7 @@
 from agent.graph import build_graph
+from dotenv import load_dotenv
+
+load_dotenv()
 
 if __name__ == "__main__":
     graph = build_graph()

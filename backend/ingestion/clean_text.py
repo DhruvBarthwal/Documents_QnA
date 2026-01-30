@@ -20,16 +20,17 @@ def clean_line(line: str) -> str:
     line = line.strip()
     
     line = re.sub(
-    r"(?:\b[A-Za-z]\s){3,}[A-Za-z]",
-    lambda m: m.group(0).replace(" ", ""),
-    line
-)
+        r"(?:\b[A-Za-z]\s){3,}[A-Za-z]",
+        lambda m: m.group(0).replace(" ", ""),
+        line
+    )
 
     line = re.sub(
         r"(?:\b\d\s){3,}\d",
         lambda m: m.group(0).replace(" ", ""),
         line
     )
+    line = re.sub(r'[\uf0b7\uf0a7]', '', line)
     
     if PAGE_NUMBER_RE.match(line):
         return ""

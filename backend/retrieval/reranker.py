@@ -4,7 +4,7 @@ from sentence_transformers import CrossEncoder
 RERANKER_MODEL = "BAAI/bge-reranker-base"
 
 class Reranker:
-    def _init__(self):
+    def __init__(self):
         self.model = CrossEncoder(RERANKER_MODEL)
         
     def rerank(
@@ -28,19 +28,19 @@ class Reranker:
             
         reranked = sorted(
             results,
-            key = lambda x : x ["reranK_score"],
+            key = lambda x : x ["rerank_score"],
             reverse = True
         )
         
         return reranked[:top_k]
 
 if __name__ == "__main__":
-    from retrieval.faiss_search import FaissSearcher
+    from faiss_search import FaissSearcher
 
     searcher = FaissSearcher()
     reranker = Reranker()
 
-    query = "What is the termination notice period?"
+    query = "What is Deep learning architecture?"
     initial_results = searcher.search(query, top_k=20)
 
     reranked = reranker.rerank(query, initial_results, top_k=5)
