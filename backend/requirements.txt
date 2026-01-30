@@ -1,0 +1,13 @@
+beautifulsoup4
+pypdf
+python-docx
+langchain
+langchain-text-splitters
+sentence-transformers
+numpy
+tqdm
+faiss-cpu
+mcp
+langgraph
+langchain-core
+diskcache

@@ -1,0 +1,66 @@
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+.eggs/
+.venv/
+venv/
+env/
+
+# =========================
+# IDEs & Editors
+# =========================
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# =========================
+# OS files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Logs
+# =========================
+*.log
+
+# =========================
+# Data files (IMPORTANT)
+# =========================
+data/raw/
+data/processed/
+data/embeddings/
+
+# =========================
+# Model / Embedding artifacts
+# =========================
+*.npy
+*.npz
+*.pt
+*.bin
+*.ckpt
+
+# =========================
+# Jupyter
+# =========================
+.ipynb_checkpoints/
+
+# =========================
+# Environment variables
+# =========================
+.env
+.env.*
+
+# =========================
+# Temporary files
+# =========================
+tmp/
+cache/
+
+echo .env >> .gitignore
