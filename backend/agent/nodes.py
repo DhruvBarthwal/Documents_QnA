@@ -6,27 +6,56 @@ import os
 from langchain_core.messages import SystemMessage, HumanMessage
 import requests
 from cache.cache import AnswerCache
+import runtime_store
+from retrieval.reranker import Reranker
+from sentence_transformers import SentenceTransformer
+import numpy as np
+from dotenv import load_dotenv
 
+load_dotenv()
 cache = AnswerCache()
+reranker = Reranker()
+embedder = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+
 
 llm = ChatGroq(
     model = "llama-3.1-8b-instant",
     max_tokens = 300,
     temperature = 0.2,
-    api_key = os.getenv("GROQ_API_KEY")
 )
 
 def retrieve_node(state: AgentState) -> AgentState:
-    response = requests.post(
-        "http://localhost:3333/mcp/search_documents",
-        json={
-            "query": state["query"],
-            "top_k": 5
-        },
-        timeout=30
-    )
+    if runtime_store.FAISS_INDEX is None:
+        state["contexts"] = []
+        return state
 
-    state["contexts"] = response.json().get("results", [])
+    query_vec = embedder.encode(
+        [state["query"]], normalize_embeddings=True
+    ).astype("float32")
+
+    scores, indices = runtime_store.FAISS_INDEX.search(query_vec, 20)
+
+    results = []
+    for score, idx in zip(scores[0], indices[0]):
+        if idx == -1:
+            continue
+        results.append({
+            "text": runtime_store.TEXTS[idx],
+            "score": float(score),
+            "metadata": runtime_store.METADATA[idx]
+        })
+
+    if not results:
+        state["contexts"] = []
+        return state
+
+    if len(results) >= 10:
+        state["contexts"] = reranker.rerank(
+            state["query"], results, top_k=5
+        )
+    else:
+        state["contexts"] = results[:5]
+
     return state
 
 def validate_node(state: AgentState) -> AgentState:
@@ -46,14 +75,18 @@ def generate_node(state: AgentState) -> AgentState:
         SystemMessage(content= SYSTEM_PROMPT),
         HumanMessage(
             content=f"""
-            
-            Context : 
+            Context:
             {context_text}
-            
+
+            Task:
+            Answer the question using the context above.
+            Explain the concept clearly and in detail, but do not add information that is not present in the context.
+
             Question:
-            {state["query"]} 
+            {state["query"]}
             """
         )
+
     ]
     
     response = llm.invoke(messages)

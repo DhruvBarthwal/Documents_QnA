@@ -1,0 +1,3 @@
+FAISS_INDEX = None
+TEXTS = None
+METADATA = None
