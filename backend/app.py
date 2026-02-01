@@ -10,6 +10,7 @@ from ingestion.clean_text import clean_documents
 from ingestion.chunk_docs import chunk_documents
 import runtime_store
 from sentence_transformers import SentenceTransformer
+from fastapi.middleware.cors import CORSMiddleware
 
 
 from agent.graph import build_graph
@@ -17,6 +18,15 @@ from agent.graph import build_graph
 embedder = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
 
 app = FastAPI(title="Drag & Drop RAG")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 graph = build_graph()
 
