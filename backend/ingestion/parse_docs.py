@@ -91,7 +91,3 @@ def parse_directory(data_dir : str) -> List[Dict]:
                     print(f"[WARN] Failed to parse {file_path}: {e}")
                     
     return parsed_docs
-
-if __name__ == "__main__":
-    docs = parse_directory("data/raw")
-    print(f"Parsed {len(docs)} document units")

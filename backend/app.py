@@ -8,6 +8,7 @@ import numpy as np
 from ingestion.parse_docs import parse_file
 from ingestion.clean_text import clean_documents
 from ingestion.chunk_docs import chunk_documents
+from ingestion.embed_docs import embed_documents
 import runtime_store
 from sentence_transformers import SentenceTransformer
 from fastapi.middleware.cors import CORSMiddleware
@@ -53,10 +54,11 @@ async def upload(file: UploadFile = File(...)):
         runtime_store.TEXTS = [c["text"] for c in chunks]
         runtime_store.METADATA = [c["metadata"] for c in chunks]
 
-        embeddings = embedder.encode(
-            runtime_store.TEXTS,
-            normalize_embeddings=True
-        ).astype("float32")
+        embeddings = embed_documents(
+                    chunks,
+                    model=embedder,
+                    batch_size=32
+                    ).astype("float32")
 
         dim = embeddings.shape[1]
         runtime_store.FAISS_INDEX = faiss.IndexFlatIP(dim)

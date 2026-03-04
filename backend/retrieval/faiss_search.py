@@ -1,6 +1,7 @@
 import os 
 import json
 from typing import List, Dict
+import time
 
 import faiss
 import numpy as np
@@ -43,7 +44,9 @@ class FaissSearcher:
     def search(self, query: str, top_k: int = 5) -> List[Dict]:
         query_vec = self.embed_query(query)
 
+        start = time.time()
         scores, indices = self.index.search(query_vec, top_k)
+        print("FAISS time:", time.time() - start)
 
         seen = set()
         results = []
@@ -70,15 +73,3 @@ class FaissSearcher:
 
         return results
 
-
-if __name__ == "__main__":
-    searcher = FaissSearcher()
-
-    query = "What to do in Convolutional Neural Networks ?"
-    results = searcher.search(query, top_k=3)
-
-    for i, r in enumerate(results, 1):
-        print(f"\nResult {i}")
-        print("Score:", r["score"])
-        print("Metadata:", r["metadata"])
-        print("Text:", r["text"][:300], "...")

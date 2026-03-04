@@ -7,14 +7,12 @@ from langchain_core.messages import SystemMessage, HumanMessage
 import requests
 from cache.cache import AnswerCache
 import runtime_store
-from retrieval.reranker import Reranker
 from sentence_transformers import SentenceTransformer
 import numpy as np
 from dotenv import load_dotenv
 
 load_dotenv()
 cache = AnswerCache()
-reranker = Reranker()
 embedder = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
 
 
@@ -29,33 +27,27 @@ def retrieve_node(state: AgentState) -> AgentState:
         state["contexts"] = []
         return state
 
+    # Embed query
     query_vec = embedder.encode(
-        [state["query"]], normalize_embeddings=True
+        [state["query"]],
+        normalize_embeddings=True
     ).astype("float32")
 
-    scores, indices = runtime_store.FAISS_INDEX.search(query_vec, 20)
+    # Search top 5 directly (no need for 20 now)
+    scores, indices = runtime_store.FAISS_INDEX.search(query_vec, 5)
 
     results = []
     for score, idx in zip(scores[0], indices[0]):
         if idx == -1:
             continue
+
         results.append({
             "text": runtime_store.TEXTS[idx],
             "score": float(score),
             "metadata": runtime_store.METADATA[idx]
         })
 
-    if not results:
-        state["contexts"] = []
-        return state
-
-    if len(results) >= 10:
-        state["contexts"] = reranker.rerank(
-            state["query"], results, top_k=5
-        )
-    else:
-        state["contexts"] = results[:5]
-
+    state["contexts"] = results
     return state
 
 def validate_node(state: AgentState) -> AgentState:

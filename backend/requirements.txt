@@ -12,3 +12,4 @@ langgraph
 langchain-core
 diskcache
 fastapi
+langchain-groq

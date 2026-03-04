@@ -10,7 +10,7 @@ HEADER_FOOTER_RE = re.compile(
 
 def clean_line(line: str) -> str:
     """
-    Cleans a simgle line of text by removing extra spaces and newlines.
+    Cleans a single line of text by removing extra spaces and newlines.
     
     :param line: Raw text line
     :type line: str

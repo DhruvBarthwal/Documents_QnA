@@ -14,7 +14,7 @@ def chunk_documents(
     :param chunk_size: Maximum number of tokens per chunk
     :type chunk_size: int
     :param chunk_overlap: Number of overlapping tokens between consecutive chunks
-    :type chunk_overlap: int
+    :type chunk_overlap: in8
     :return: List of chunked documents with preserved metadata
     :rtype: List[Dict]
     """
@@ -41,14 +41,3 @@ def chunk_documents(
             })
             
     return chunked_docs
-
-if __name__ == "__main__":
-    from parse_docs import parse_directory
-    from clean_text import clean_documents
-    
-    raw_docs = parse_directory("data/raw")
-    cleaned_docs = clean_documents(raw_docs)
-    chunked_docs = chunk_documents(cleaned_docs)
-    
-    print(f"Dcouments: {len(cleaned_docs)}")
-    print(f"Chunks: {len(chunked_docs)}")
