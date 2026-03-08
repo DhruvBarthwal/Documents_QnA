@@ -12,7 +12,11 @@ const page = () => {
   const [latency, setLatency] = useState(0);
 
   return (
-    <div className="bg-gray-950 text-white items-center flex flex-col h-screen w-full mx auto p-6">
+    <div className=" relative bg-gray-950 text-white items-center flex flex-col h-screen w-full mx auto p-6 overflow-x-hidden">
+      <div className="absolute -left-40 top-1/3 w-[500px] h-[450px] bg-purple-600 rounded-full blur-[180px] opacity-40"></div>
+
+      <div className="absolute -right-40 top-1/3 w-[500px] h-[450px] bg-blue-600 rounded-full blur-[180px] opacity-40"></div>
+
       <Navbar/>
       <div className="flex flex-col items-center mb-4 mt-20">
         <div className="text-[60px] font-bold">
