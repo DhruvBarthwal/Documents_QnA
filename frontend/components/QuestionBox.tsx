@@ -25,14 +25,14 @@ const QuestionBox = (
   return (
     <div className="flex gap-2 mt-8">
       <input
-        className="border bg-amber-900 border-red-900 text-[18px] p-4 w-170 flex-1 rounded-2xl"
+        className="border bg-gray-800 text-white  text-[18px] p-4 w-170 flex-1 rounded-2xl"
         placeholder="Ask a question..."
         value = {query}
         onChange = {(e) => setQuery(e.target.value)}
       />
       <button
         onClick={submit}
-        className="bg-red-700 shadow-2xl hover:bg-red-600 transition-all duration-300 text-white text-[20px] cursor-pointer font-semibold px-4 w-30 rounded-2xl"
+        className="bg-gray-400 shadow-2xl hover:bg-gray-600 transition-all duration-300 text-white text-[20px] cursor-pointer px-4 w-30 rounded-2xl"
       >
       {loading ? "Thinking.." : "Ask"}
       </button>

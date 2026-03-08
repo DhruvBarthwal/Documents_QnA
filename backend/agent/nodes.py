@@ -18,7 +18,7 @@ embedder = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
 
 llm = ChatGroq(
     model = "llama-3.1-8b-instant",
-    max_tokens = 300,
+    max_tokens = 500,
     temperature = 0.2,
 )
 
@@ -33,7 +33,6 @@ def retrieve_node(state: AgentState) -> AgentState:
         normalize_embeddings=True
     ).astype("float32")
 
-    # Search top 5 directly (no need for 20 now)
     scores, indices = runtime_store.FAISS_INDEX.search(query_vec, 5)
 
     results = []

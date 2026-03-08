@@ -8,7 +8,7 @@ from tqdm import tqdm
 
 model = "sentence-transformers/all-MiniLM-L6-v2"
 
-def embed_documents(docs, model, batch_size=32):
+def embed_documents(docs, model, batch_size=128):
     texts = [doc["text"] for doc in docs]
     embeddings = []
 
